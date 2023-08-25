@@ -7,7 +7,7 @@
 
 # ### Importing the libraries
 
-# In[22]:
+# In[1]:
 
 
 import numpy as np
@@ -15,14 +15,20 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 
+# In[2]:
+
+
+from datetime import datetime, timedelta
+
+
 # ### Importing the training set
 
-# In[23]:
+# In[3]:
 
 
-data = '2023-07-21'
-dataset= pd.read_csv('GPW_ZEPAK.csv')
-# df_merged=df_merged.loc[df_merged['Nazwa spółki'] == 'ZYWIEC']
+stock='ZEPAK'
+dataset= pd.read_csv('GPW_{}.csv'.format(stock))
+
 iloc1=4
 iloc2=5
 
@@ -30,6 +36,14 @@ iloc2=5
 ostatnia_wartosc = dataset['Dzień'].iloc[-1]
 ostatnia_wartosc = pd.to_datetime(ostatnia_wartosc).strftime('%Y-%m-%d')
 ostatnia_wartosc= str(ostatnia_wartosc)
+
+delta=10
+
+data= datetime.strptime(ostatnia_wartosc, '%Y-%m-%d')
+data= data-timedelta(days = delta)
+data= pd.to_datetime(data).strftime('%Y-%m-%d')
+print(data)
+
 dataset_train1= dataset[dataset['Dzień'] < data]
 training_set1 = dataset_train1.iloc[:,iloc1:iloc2].values
 arr = training_set1
@@ -46,7 +60,19 @@ print(len(dataset),len(training_set),len(dataset_test1))
 
 
 
-# In[24]:
+# In[4]:
+
+
+dataset_test1
+
+
+# In[5]:
+
+
+data
+
+
+# In[6]:
 
 
 ostatnia_wartosc
@@ -54,7 +80,7 @@ ostatnia_wartosc
 
 # ### Feature Scaling
 
-# In[25]:
+# In[7]:
 
 
 from sklearn.preprocessing import MinMaxScaler
@@ -64,7 +90,7 @@ training_set_scaled = sc.fit_transform(training_set)
 
 # ### Creating a data structure with 60 timesteps and 1 output
 
-# In[26]:
+# In[8]:
 
 
 X_train = []
@@ -79,7 +105,7 @@ X_train, y_train = np.array(X_train), np.array(y_train)
 
 # ### Reshaping
 
-# In[27]:
+# In[9]:
 
 
 X_train = np.reshape(X_train, (X_train.shape[0], X_train.shape[1], 1))
@@ -89,7 +115,7 @@ X_train = np.reshape(X_train, (X_train.shape[0], X_train.shape[1], 1))
 
 # ### Importing the Keras libraries and packages
 
-# In[28]:
+# In[10]:
 
 
 from keras.models import Sequential
@@ -104,7 +130,7 @@ clear_session()
 
 # ### Initialising the RNN
 
-# In[29]:
+# In[11]:
 
 
 regressor = Sequential()
@@ -112,7 +138,7 @@ regressor = Sequential()
 
 # ### Adding the first LSTM layer and some Dropout regularisation
 
-# In[30]:
+# In[12]:
 
 
 regressor.add(LSTM(units = 60, return_sequences=True, input_shape=(X_train.shape[1], X_train.shape[2])))
@@ -121,7 +147,7 @@ regressor.add(Dropout(0.2))
 
 # ### Adding a second LSTM layer and some Dropout regularisation
 
-# In[31]:
+# In[13]:
 
 
 regressor.add(LSTM(units = 60, return_sequences = True))
@@ -130,7 +156,7 @@ regressor.add(Dropout(0.2))
 
 # ### Adding a third LSTM layer and some Dropout regularisation
 
-# In[32]:
+# In[14]:
 
 
 regressor.add(LSTM(units = 60, return_sequences = True))
@@ -139,7 +165,7 @@ regressor.add(Dropout(0.2))
 
 # ### Adding a fourth LSTM layer and some Dropout regularisation
 
-# In[33]:
+# In[15]:
 
 
 regressor.add(LSTM(units = 60))
@@ -148,7 +174,7 @@ regressor.add(Dropout(0.2))
 
 # ### Adding the output layer
 
-# In[34]:
+# In[16]:
 
 
 regressor.add(Dense(units = 1))
@@ -156,7 +182,7 @@ regressor.add(Dense(units = 1))
 
 # ### Compiling the RNN
 
-# In[35]:
+# In[17]:
 
 
 regressor.compile(optimizer = 'adam', loss = 'mean_squared_error')
@@ -164,37 +190,34 @@ regressor.compile(optimizer = 'adam', loss = 'mean_squared_error')
 
 # ### Fitting the RNN to the Training set
 
-# In[36]:
+# In[18]:
 
 
-regressor.fit(X_train, y_train, epochs = 100, batch_size = 32)
+regressor.fit(X_train, y_train, epochs =1, batch_size = 32)
 
 
 # ## Part 3 - Making the predictions and visualising the results
 
 # ### Getting the real stock price of 2017
 
-# In[37]:
+# In[19]:
 
 
 # dataset_test = pd.read_csv('Google_Stock_Price_Test.csv')
 real_stock_price = dataset_test1.iloc[:, iloc1:iloc2].values
-
 arr = real_stock_price
-
 # Zmiana typu z string na int
 for i in range(len(arr)):
     arr[i] = round(float(arr[i][0].replace(',', '.')), 3)
-
 real_stock_price = arr
-len(real_stock_price)
-real_stock_price
 
+
+len(real_stock_price)
 
 
 # ### Getting the predicted stock price of 2017
 
-# In[38]:
+# In[20]:
 
 
 dataset_total = pd.concat((dataset_train1['Kurs zamknięcia'], dataset_test1['Kurs zamknięcia']), axis = 0)
@@ -203,7 +226,6 @@ arr = dataset_total
 for i in range(len(arr)):
     arr[i] = (float(arr[i].replace(',', '.')))
 dataset_total = arr
-dataset_total
 
 inputs = dataset_total[len(dataset_total) - len(dataset_test1) - timestep:].values
 inputs = inputs.reshape(-1, 1)
@@ -229,7 +251,7 @@ predicted_test_prices = sc.inverse_transform(predicted_test_prices)
 # # predicted_stock_price = sc.inverse_transform(predicted_stock_price)
 
 
-# In[48]:
+# In[21]:
 
 
 # Przewidywanie 10 dni do przodu
@@ -245,75 +267,76 @@ for i in range(10):
 predicted_future_prices = sc.inverse_transform(np.array(predicted_future_prices).reshape(-1, 1))
 
 predicted_future_prices=predicted_future_prices.tolist()
-print(predicted_future_prices)
 # Wyświetlanie przewidywanych wartości
-pfp_zepak_20230711=[[20.34819],
- [21.669386],
- [22.290026],
- [22.327923],
- [22.439547],
- [22.188908],
- [22.116632],
- [22.198847],
- [22.482422],
- [22.736067]]
+# pfp_zepak_20230711=[[20.34819],
+#  [21.669386],
+#  [22.290026],
+#  [22.327923],
+#  [22.439547],
+#  [22.188908],
+#  [22.116632],
+#  [22.198847],
+#  [22.482422],
+#  [22.736067]]
 
-pfp_zepak_20230712=[[20.176626],
- [22.483492],
- [23.121317],
- [22.927519],
- [22.81228 ],
- [23.133865],
- [23.50026 ],
- [23.68236 ],
- [23.411707],
- [23.229382]]
+# pfp_zepak_20230712=[[20.176626],
+#  [22.483492],
+#  [23.121317],
+#  [22.927519],
+#  [22.81228 ],
+#  [23.133865],
+#  [23.50026 ],
+#  [23.68236 ],
+#  [23.411707],
+#  [23.229382]]
 
 
 
 # ### Visualising the results
 
-# In[49]:
+# In[22]:
 
 
 import itertools
 
 ppp=[predicted_test_prices, predicted_future_prices]
-ppp2=[predicted_test_prices[:-1], pfp_zepak_20230711]
-ppp3=[predicted_test_prices[:-1], pfp_zepak_20230712]
+# ppp2=[predicted_test_prices[:-1], pfp_zepak_20230711]
+# ppp3=[predicted_test_prices[:-1], pfp_zepak_20230712]
 ppp=list(itertools.chain.from_iterable(ppp))
-ppp2=list(itertools.chain.from_iterable(ppp2))
-ppp3=list(itertools.chain.from_iterable(ppp3))
-print(type(ppp3))
-print(type(ppp2))
+# ppp2=list(itertools.chain.from_iterable(ppp2))
+# ppp3=list(itertools.chain.from_iterable(ppp3))
+# print(type(ppp3))
+# print(type(ppp2))
 print(type(ppp))
 
 
-# In[50]:
+# In[23]:
 
 
 ostatnia_wartosc
 
 
-# In[51]:
+# In[24]:
 
 
-from datetime import datetime, timedelta
-r=28
+r=delta+9
+
 lable=[]
 ostatnia_wartosc=str(ostatnia_wartosc)
 for i in range(r):
     lable.append(i)
+    
 lables=[]
 for i in range(r):
     lables.append('')
 
-lables[0]=data
+lables[0]=str(data)
 lables[len(real_stock_price)-1]=str(ostatnia_wartosc)
-lables[len(real_stock_price)-2]='D -1'
+lables[len(real_stock_price)-2]='D −1'
+lables[len(real_stock_price)]='D +1'
 
 ostatnia_wartosc = datetime.strptime(ostatnia_wartosc, '%Y-%m-%d').date()
-lables[len(ppp3)]=(ostatnia_wartosc+timedelta(days=10)).strftime('%Y-%m-%d')
+# lables[len(ppp3)]=(ostatnia_wartosc+timedelta(days=10)).strftime('%Y-%m-%d')
 
 plt.plot(real_stock_price, color = 'red', label = 'True Price')
 # plt.plot(ppp3, color = 'grey', linestyle='dashed', alpha=1, label = 'Old D-2 Predicted Stock Price')
@@ -322,10 +345,12 @@ plt.plot(ppp, color = 'green', linestyle='dashed', label = 'Future Predicted Sto
 plt.plot(predicted_test_prices, color = 'blue', label = 'Test Predicted Stock Price')
 # plt.gca().invert_xaxis()
 plt.xticks(ticks=lable, labels=lables, rotation=85)
-plt.title('ZEPAK Stock Price Prediction')
+plt.title('{} Stock Price Prediction'.format(stock))
 plt.xlabel('Time')
-plt.ylabel('ZEPAK Stock Price')
+plt.ylabel('{} Stock Price'.format(stock))
 plt.legend()
 
+regressor.save('{}_RNN_MODEL.h5'.format(stock))
+plt.savefig('{}_prediction.png'.format(stock), bbox_inches="tight")
 plt.show()
 
