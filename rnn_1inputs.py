@@ -7,7 +7,7 @@
 
 # ### Importing the libraries
 
-# In[1]:
+# In[2]:
 
 
 import numpy as np
@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 
-# In[2]:
+# In[3]:
 
 
 from datetime import datetime, timedelta
@@ -23,7 +23,7 @@ from datetime import datetime, timedelta
 
 # ### Importing the training set
 
-# In[3]:
+# In[4]:
 
 
 stock='ZEPAK'
@@ -60,19 +60,19 @@ print(len(dataset),len(training_set),len(dataset_test1))
 
 
 
-# In[4]:
+# In[5]:
 
 
 dataset_test1
 
 
-# In[5]:
+# In[6]:
 
 
 data
 
 
-# In[6]:
+# In[7]:
 
 
 ostatnia_wartosc
@@ -80,7 +80,7 @@ ostatnia_wartosc
 
 # ### Feature Scaling
 
-# In[7]:
+# In[8]:
 
 
 from sklearn.preprocessing import MinMaxScaler
@@ -90,7 +90,7 @@ training_set_scaled = sc.fit_transform(training_set)
 
 # ### Creating a data structure with 60 timesteps and 1 output
 
-# In[8]:
+# In[9]:
 
 
 X_train = []
@@ -105,7 +105,7 @@ X_train, y_train = np.array(X_train), np.array(y_train)
 
 # ### Reshaping
 
-# In[9]:
+# In[10]:
 
 
 X_train = np.reshape(X_train, (X_train.shape[0], X_train.shape[1], 1))
@@ -115,7 +115,7 @@ X_train = np.reshape(X_train, (X_train.shape[0], X_train.shape[1], 1))
 
 # ### Importing the Keras libraries and packages
 
-# In[10]:
+# In[11]:
 
 
 from keras.models import Sequential
@@ -130,7 +130,7 @@ clear_session()
 
 # ### Initialising the RNN
 
-# In[11]:
+# In[12]:
 
 
 regressor = Sequential()
@@ -138,7 +138,7 @@ regressor = Sequential()
 
 # ### Adding the first LSTM layer and some Dropout regularisation
 
-# In[12]:
+# In[13]:
 
 
 regressor.add(LSTM(units = 60, return_sequences=True, input_shape=(X_train.shape[1], X_train.shape[2])))
@@ -147,7 +147,7 @@ regressor.add(Dropout(0.2))
 
 # ### Adding a second LSTM layer and some Dropout regularisation
 
-# In[13]:
+# In[14]:
 
 
 regressor.add(LSTM(units = 60, return_sequences = True))
@@ -156,7 +156,7 @@ regressor.add(Dropout(0.2))
 
 # ### Adding a third LSTM layer and some Dropout regularisation
 
-# In[14]:
+# In[15]:
 
 
 regressor.add(LSTM(units = 60, return_sequences = True))
@@ -165,7 +165,7 @@ regressor.add(Dropout(0.2))
 
 # ### Adding a fourth LSTM layer and some Dropout regularisation
 
-# In[15]:
+# In[16]:
 
 
 regressor.add(LSTM(units = 60))
@@ -174,7 +174,7 @@ regressor.add(Dropout(0.2))
 
 # ### Adding the output layer
 
-# In[16]:
+# In[17]:
 
 
 regressor.add(Dense(units = 1))
@@ -182,7 +182,7 @@ regressor.add(Dense(units = 1))
 
 # ### Compiling the RNN
 
-# In[17]:
+# In[18]:
 
 
 regressor.compile(optimizer = 'adam', loss = 'mean_squared_error')
@@ -190,7 +190,7 @@ regressor.compile(optimizer = 'adam', loss = 'mean_squared_error')
 
 # ### Fitting the RNN to the Training set
 
-# In[18]:
+# In[19]:
 
 
 regressor.fit(X_train, y_train, epochs =1, batch_size = 32)
@@ -200,7 +200,7 @@ regressor.fit(X_train, y_train, epochs =1, batch_size = 32)
 
 # ### Getting the real stock price of 2017
 
-# In[19]:
+# In[20]:
 
 
 # dataset_test = pd.read_csv('Google_Stock_Price_Test.csv')
@@ -217,7 +217,7 @@ len(real_stock_price)
 
 # ### Getting the predicted stock price of 2017
 
-# In[20]:
+# In[21]:
 
 
 dataset_total = pd.concat((dataset_train1['Kurs zamknięcia'], dataset_test1['Kurs zamknięcia']), axis = 0)
@@ -251,7 +251,7 @@ predicted_test_prices = sc.inverse_transform(predicted_test_prices)
 # # predicted_stock_price = sc.inverse_transform(predicted_stock_price)
 
 
-# In[21]:
+# In[22]:
 
 
 # Przewidywanie 10 dni do przodu
@@ -294,7 +294,7 @@ predicted_future_prices=predicted_future_prices.tolist()
 
 # ### Visualising the results
 
-# In[22]:
+# In[23]:
 
 
 import itertools
@@ -310,13 +310,13 @@ ppp=list(itertools.chain.from_iterable(ppp))
 print(type(ppp))
 
 
-# In[23]:
+# In[24]:
 
 
 ostatnia_wartosc
 
 
-# In[24]:
+# In[27]:
 
 
 r=delta+9
@@ -350,7 +350,7 @@ plt.xlabel('Time')
 plt.ylabel('{} Stock Price'.format(stock))
 plt.legend()
 
-regressor.save('{}_RNN_MODEL.h5'.format(stock))
-plt.savefig('{}_prediction.png'.format(stock), bbox_inches="tight")
+regressor.save(r'C:\Users\Aleksander\Desktop\ZEPAK_RNN\{}_RNN_MODEL.h5'.format(stock))
+plt.savefig(r'C:\Users\Aleksander\Desktop\ZEPAK_RNN\{}_prediction.png'.format(stock), bbox_inches="tight")
 plt.show()
 
