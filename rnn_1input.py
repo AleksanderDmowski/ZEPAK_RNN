@@ -193,7 +193,7 @@ regressor.compile(optimizer = 'adam', loss = 'mean_squared_error')
 # In[19]:
 
 
-regressor.fit(X_train, y_train, epochs =5, batch_size = 32)
+regressor.fit(X_train, y_train, epochs =3, batch_size = 32)
 
 
 # ## Part 3 - Making the predictions and visualising the results
@@ -352,5 +352,5 @@ plt.legend()
 
 regressor.save(r'C:\Users\Aleksander\Desktop\ZEPAK_RNN\{}_RNN_MODEL.h5'.format(stock))
 plt.savefig(r'C:\Users\Aleksander\Desktop\ZEPAK_RNN\{}_prediction.png'.format(stock), bbox_inches="tight")
-plt.show()
+# plt.show()
 
