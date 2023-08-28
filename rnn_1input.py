@@ -14,7 +14,10 @@
 """
 
 # %%
-%reset -f
+try:
+    %reset -f
+except:
+    print('x')
 
 # %%
 import numpy as np
@@ -360,4 +363,10 @@ plt.savefig(r'C:\Users\Aleksander\Desktop\ZEPAK_RNN\{}_prediction.png'.format(st
 
 
 # %%
-%reset -f
+try:
+    %reset -f
+except:
+    print('x')
+
+
+# %%
