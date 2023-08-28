@@ -1,31 +1,40 @@
-#!/usr/bin/env python
-# coding: utf-8
+# %%
+"""
+# Recurrent Neural Network
+"""
 
-# # Recurrent Neural Network
+# %%
+"""
+## Part 1 - Data Preprocessing
+"""
 
-# ## Part 1 - Data Preprocessing
+# %%
+"""
+### Importing the libraries
+"""
 
-# ### Importing the libraries
+# %%
+%reset -f
 
-# In[2]:
-
-
+# %%
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 
 
-# In[3]:
-
-
+# %%
 from datetime import datetime, timedelta
+import tensorflow as tf
+from keras.backend import clear_session
+tf.compat.v1.reset_default_graph()
+clear_session() 
 
+# %%
+"""
+### Importing the training set
+"""
 
-# ### Importing the training set
-
-# In[4]:
-
-
+# %%
 stock='ZEPAK'
 dataset= pd.read_csv('GPW_{}.csv'.format(stock))
 
@@ -60,39 +69,33 @@ print(len(dataset),len(training_set),len(dataset_test1))
 
 
 
-# In[5]:
-
-
+# %%
 dataset_test1
 
-
-# In[6]:
-
-
+# %%
 data
 
-
-# In[7]:
-
-
+# %%
 ostatnia_wartosc
 
 
-# ### Feature Scaling
+# %%
+"""
+### Feature Scaling
+"""
 
-# In[8]:
-
-
+# %%
 from sklearn.preprocessing import MinMaxScaler
 sc = MinMaxScaler(feature_range = (0, 1))
 training_set_scaled = sc.fit_transform(training_set)
 
 
-# ### Creating a data structure with 60 timesteps and 1 output
+# %%
+"""
+### Creating a data structure with 60 timesteps and 1 output
+"""
 
-# In[9]:
-
-
+# %%
 X_train = []
 y_train = []
 X_train2 = []
@@ -102,107 +105,113 @@ for i in range(timestep,  len(training_set)):
     y_train.append(training_set_scaled[i, 0])
 X_train, y_train = np.array(X_train), np.array(y_train)
 
+# %%
+"""
+### Reshaping
+"""
 
-# ### Reshaping
-
-# In[10]:
-
-
+# %%
 X_train = np.reshape(X_train, (X_train.shape[0], X_train.shape[1], 1))
 
 
-# ## Part 2 - Building and Training the RNN
+# %%
+"""
+## Part 2 - Building and Training the RNN
+"""
 
-# ### Importing the Keras libraries and packages
+# %%
+"""
+### Importing the Keras libraries and packages
+"""
 
-# In[11]:
-
-
+# %%
 from keras.models import Sequential
 from keras.layers import Dense
 from keras.layers import LSTM
 from keras.layers import Dropout
-from keras.backend import clear_session
-import tensorflow as tf
-tf.compat.v1.reset_default_graph()
-clear_session() 
 
 
-# ### Initialising the RNN
-
-# In[12]:
 
 
+# %%
+"""
+### Initialising the RNN
+"""
+
+# %%
 regressor = Sequential()
 
+# %%
+"""
+### Adding the first LSTM layer and some Dropout regularisation
+"""
 
-# ### Adding the first LSTM layer and some Dropout regularisation
-
-# In[13]:
-
-
+# %%
 regressor.add(LSTM(units = 60, return_sequences=True, input_shape=(X_train.shape[1], X_train.shape[2])))
 regressor.add(Dropout(0.2))
 
+# %%
+"""
+### Adding a second LSTM layer and some Dropout regularisation
+"""
 
-# ### Adding a second LSTM layer and some Dropout regularisation
-
-# In[14]:
-
-
+# %%
 regressor.add(LSTM(units = 60, return_sequences = True))
 regressor.add(Dropout(0.2))
 
+# %%
+"""
+### Adding a third LSTM layer and some Dropout regularisation
+"""
 
-# ### Adding a third LSTM layer and some Dropout regularisation
-
-# In[15]:
-
-
+# %%
 regressor.add(LSTM(units = 60, return_sequences = True))
 regressor.add(Dropout(0.2))
 
+# %%
+"""
+### Adding a fourth LSTM layer and some Dropout regularisation
+"""
 
-# ### Adding a fourth LSTM layer and some Dropout regularisation
-
-# In[16]:
-
-
+# %%
 regressor.add(LSTM(units = 60))
 regressor.add(Dropout(0.2))
 
+# %%
+"""
+### Adding the output layer
+"""
 
-# ### Adding the output layer
-
-# In[17]:
-
-
+# %%
 regressor.add(Dense(units = 1))
 
+# %%
+"""
+### Compiling the RNN
+"""
 
-# ### Compiling the RNN
-
-# In[18]:
-
-
+# %%
 regressor.compile(optimizer = 'adam', loss = 'mean_squared_error')
 
+# %%
+"""
+### Fitting the RNN to the Training set
+"""
 
-# ### Fitting the RNN to the Training set
-
-# In[19]:
-
-
+# %%
 regressor.fit(X_train, y_train, epochs =100, batch_size = 32)
 
+# %%
+"""
+## Part 3 - Making the predictions and visualising the results
+"""
 
-# ## Part 3 - Making the predictions and visualising the results
+# %%
+"""
+### Getting the real stock price of 2017
+"""
 
-# ### Getting the real stock price of 2017
-
-# In[20]:
-
-
+# %%
 # dataset_test = pd.read_csv('Google_Stock_Price_Test.csv')
 real_stock_price = dataset_test1.iloc[:, iloc1:iloc2].values
 arr = real_stock_price
@@ -214,12 +223,12 @@ real_stock_price = arr
 
 len(real_stock_price)
 
+# %%
+"""
+### Getting the predicted stock price of 2017
+"""
 
-# ### Getting the predicted stock price of 2017
-
-# In[21]:
-
-
+# %%
 dataset_total = pd.concat((dataset_train1['Kurs zamknięcia'], dataset_test1['Kurs zamknięcia']), axis = 0)
 arr = dataset_total
 # Zmiana typu z string na int
@@ -251,9 +260,7 @@ predicted_test_prices = sc.inverse_transform(predicted_test_prices)
 # # predicted_stock_price = sc.inverse_transform(predicted_stock_price)
 
 
-# In[22]:
-
-
+# %%
 # Przewidywanie 10 dni do przodu
 X_future = X_test.copy()
 predicted_future_prices = []
@@ -292,11 +299,12 @@ predicted_future_prices=predicted_future_prices.tolist()
 
 
 
-# ### Visualising the results
+# %%
+"""
+### Visualising the results
+"""
 
-# In[23]:
-
-
+# %%
 import itertools
 
 ppp=[predicted_test_prices, predicted_future_prices]
@@ -310,14 +318,10 @@ ppp=list(itertools.chain.from_iterable(ppp))
 print(type(ppp))
 
 
-# In[24]:
-
-
+# %%
 ostatnia_wartosc
 
-
-# In[27]:
-
+# %%
 
 r=delta+9
 
@@ -354,3 +358,6 @@ regressor.save(r'C:\Users\Aleksander\Desktop\ZEPAK_RNN\{}_RNN_MODEL.h5'.format(s
 plt.savefig(r'C:\Users\Aleksander\Desktop\ZEPAK_RNN\{}_prediction.png'.format(stock), bbox_inches="tight")
 # plt.show()
 
+
+# %%
+%reset -f
