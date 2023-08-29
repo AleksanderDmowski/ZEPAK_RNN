@@ -12,22 +12,16 @@ from keras.backend import clear_session
 
 tf.compat.v1.reset_default_graph()
 
+import os 
+dir_path = os.path.dirname(os.path.realpath(__file__))
+print(dir_path)
+
 clear_session() 
-
-
-
-
-
-import os
-
-cwd = os.getcwd()
-
-cwd
 stock='ZEPAK'
 
-dataset= pd.read_csv('{}\GPW_{}.csv'.format(cwd, stock))
+dataset= pd.read_csv('{}\GPW_{}.csv'.format(dir_path, stock))
 
-dataset
+
 
 iloc1=4
 
@@ -139,7 +133,7 @@ regressor.add(LSTM(units = 60))
 regressor.add(Dropout(0.2))
 regressor.add(Dense(units = 1))
 regressor.compile(optimizer = 'adam', loss = 'mean_squared_error')
-regressor.fit(X_train, y_train, epochs =100, batch_size = 32)
+regressor.fit(X_train, y_train, epochs =10, batch_size = 32)
 real_stock_price = dataset_test1.iloc[:, iloc1:iloc2].values
 
 arr = real_stock_price
