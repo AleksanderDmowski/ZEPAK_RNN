@@ -22,7 +22,7 @@ import os
 
 cwd = os.getcwd()
 
-cwd
+os.chdir(os.getcwd())
 stock='ZEPAK'
 
 dataset= pd.read_csv('{}\GPW_{}.csv'.format(cwd, stock))
