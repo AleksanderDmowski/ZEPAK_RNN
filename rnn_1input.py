@@ -27,17 +27,23 @@ stock='ZEPAK'
 
 dataset= pd.read_csv('{}\GPW_{}.csv'.format(cwd, stock))
 
-dataset
-
 iloc1=4
 
 iloc2=5
 
-
+delta=10
 
 
 
 ostatnia_wartosc = dataset['Dzień'].iloc[-1]
+
+dni= pd.DataFrame()
+
+dni["Dzień"] = pd.to_datetime(dataset["Dzień"].iloc[-30:]).dt.strftime('%Y-%m-%d')
+
+dni=dni["Dzień"].values.tolist()
+
+
 
 ostatnia_wartosc = pd.to_datetime(ostatnia_wartosc).strftime('%Y-%m-%d')
 
@@ -45,7 +51,7 @@ ostatnia_wartosc= str(ostatnia_wartosc)
 
 
 
-delta=10
+
 
 
 
@@ -54,8 +60,6 @@ data= datetime.strptime(ostatnia_wartosc, '%Y-%m-%d')
 data= data-timedelta(days = delta)
 
 data= pd.to_datetime(data).strftime('%Y-%m-%d')
-
-print(data)
 
 
 
@@ -80,8 +84,6 @@ dataset_test1 = dataset[dataset['Dzień'] >= data]
 
 
 
-
-print(len(dataset),len(training_set),len(dataset_test1))
 
 
 
@@ -256,7 +258,7 @@ for i in range(r):
 
 
 
-lables[0]=str(data)
+lables[0]=str(dni[-delta])
 
 lables[len(real_stock_price)-1]=str(ostatnia_wartosc)
 
